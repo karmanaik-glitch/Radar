@@ -1,0 +1,58 @@
+
+name: Extract STRATA Markets v0.4
+
+on:
+  push:
+    paths:
+      - '.github/workflows/extract-project.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract-project:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Extract project and commit source
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ZIP="$(find . -maxdepth 1 -type f -name '*.zip' -print -quit)"
+
+          if [ -z "$ZIP" ]; then
+            echo "::error::No ZIP file found in repository root."
+            exit 1
+          fi
+
+          mkdir -p /tmp/strata-extract
+          unzip -q "$ZIP" -d /tmp/strata-extract
+
+          SOURCE="/tmp/strata-extract/strata-markets-v1"
+
+          if [ ! -d "$SOURCE" ]; then
+            echo "::error::Expected project folder not found in ZIP."
+            exit 1
+          fi
+
+          cp -a "$SOURCE"/. .
+          rm -f "$ZIP"
+
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Extract STRATA Markets v0.4 source"
+          git push
