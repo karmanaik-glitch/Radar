@@ -1,0 +1,11 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/snapshot.json
+  Cache-Control: no-store, max-age=0
+
+/sw.js
+  Cache-Control: no-cache
